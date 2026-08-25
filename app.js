@@ -1131,3 +1131,11 @@ function showResults() {
 }
 
 showStart();
+
+document.querySelectorAll("[data-instrument]").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    setTimeout(() => {
+      if (brandSub?.textContent?.includes("Узнать аккорд")) showDiscover();
+    }, 0);
+  });
+});
