@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Лад — помощник гитариста</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;0,7..72,700;1,7..72,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="atmosphere" aria-hidden="true"></div>
+
+  <main class="app">
+    <header class="brand" id="brand">
+      <p class="brand-mark">Лад</p>
+      <p class="brand-sub" id="brandSub">Помощник для тех, кто пишет песни на гитаре</p>
+      <div class="instrument-bar" role="group" aria-label="Звук">
+        <button type="button" class="instrument-btn" data-instrument="acoustic" aria-label="Акустическая гитара" aria-pressed="false">
+          <img src="icons/acoustic.png" alt="" width="44" height="44" />
+        </button>
+        <button type="button" class="instrument-btn" data-instrument="distortion" aria-label="С дисторшн" aria-pressed="false">
+          <img src="icons/distortion.png" alt="" width="44" height="44" />
+        </button>
+        <button type="button" class="instrument-btn" data-instrument="piano" aria-label="Фортепиано" aria-pressed="false">
+          <img src="icons/piano.png" alt="" width="44" height="44" />
+        </button>
+      </div>
+    </header>
+
+    <section class="stage" id="stage" aria-live="polite"></section>
+  </main>
+
+  <script src="fingering.js"></script>
+  <script src="audio.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
