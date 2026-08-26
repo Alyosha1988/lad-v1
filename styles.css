@@ -1008,3 +1008,22 @@ body {
   flex-wrap: wrap;
   gap: 0.55rem;
 }
+
+.theory-label {
+  display: block;
+  margin: 0 0 0.15rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #d4a05a;
+}
+
+.theory-degrees--soft {
+  font-size: 1.15rem;
+  color: rgba(243, 230, 212, 0.78);
+}
+
+.theory-line {
+  margin: 0 0 0.55rem;
+}
