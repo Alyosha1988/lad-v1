@@ -1103,7 +1103,7 @@ function showMood() {
       <div class="actions" style="margin-top:1rem">
         <button type="button" class="btn btn-ghost" data-open-lad-plus>Лад+</button>
         <button type="button" class="btn btn-ghost" data-open-glossary>Словарь</button>
-        <button type="button" class="btn btn-ghost" data-open-degrees>Ступени от ${state.start}</button>
+        <button type="button" class="btn btn-glow" data-open-degrees>Ступени от ${state.start}</button>
       </div>
     </div>
   `;
@@ -1295,7 +1295,7 @@ function showResults() {
         <button type="button" class="btn btn-ghost" id="allstyles">Показать все семейства</button>
         <button type="button" class="btn btn-glow" data-open-lad-plus>Лад+</button>
         <button type="button" class="btn btn-ghost" data-open-glossary>Словарь</button>
-        <button type="button" class="btn btn-ghost" data-open-degrees>Ступени от ${answers.start}</button>
+        <button type="button" class="btn btn-glow" data-open-degrees>Ступени от ${answers.start}</button>
       </div>
     </div>
   `;
