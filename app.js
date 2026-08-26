@@ -197,30 +197,49 @@ function bindTheoryHooks(root) {
       openDegrees(resume);
     });
   });
-  root.querySelectorAll("[data-set-voice]").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      e.preventDefault();
-      if (typeof LadTheory === "undefined") return;
-      LadTheory.setVoice(btn.dataset.setVoice);
-      // остаёмся на текущем оверлее / экране
-      if (state.overlay === "degrees") {
-        openDegrees(state.returnFromDegrees || showStart);
-        return;
-      }
-      if (state.overlay === "glossary") {
-        openGlossary(state.returnFromGlossary || showStart, state.glossaryFocus);
-        return;
-      }
-      if (state.overlay === "plus") {
-        openLadPlus(state.returnFromPlus || showStart);
-        return;
-      }
-      if (state.start && state.mood && state.move && state.part && state.style) showResults();
-      else if (state.start && state.mood) showMood();
-      else showStart();
-    });
-  });
+  // голос: только через document delegation (bindVoiceDelegation)
 }
+
+/** Единый обработчик голоса — не уводит с оверлея ступеней/словаря. */
+function bindVoiceDelegation() {
+  if (document.__ladVoiceBound) return;
+  document.__ladVoiceBound = true;
+  document.addEventListener(
+    "click",
+    (e) => {
+      const btn = e.target.closest("[data-set-voice], [data-voice]");
+      if (!btn) return;
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      if (typeof LadTheory === "undefined") return;
+      const voice = btn.dataset.setVoice || btn.dataset.voice;
+      if (voice !== "plain" && voice !== "pro") return;
+      LadTheory.setVoice(voice);
+      const overlay = state.overlay;
+      requestAnimationFrame(() => {
+        if (state.overlay !== overlay && overlay) return;
+        if (overlay === "degrees") {
+          openDegrees(state.returnFromDegrees || showStart);
+          return;
+        }
+        if (overlay === "glossary") {
+          openGlossary(state.returnFromGlossary || showStart, state.glossaryFocus);
+          return;
+        }
+        if (overlay === "plus") {
+          openLadPlus(state.returnFromPlus || showStart);
+          return;
+        }
+        if (state.start && state.mood && state.move && state.part && state.style) showResults();
+        else if (state.start && state.mood) showMood();
+        else showStart();
+      });
+    },
+    true
+  );
+}
+
 
 /* ---------- theory helpers ---------- */
 
@@ -1348,6 +1367,7 @@ function showResults() {
   });
 }
 
+bindVoiceDelegation();
 showStart();
 
 document.querySelectorAll("[data-instrument]").forEach((btn) => {
