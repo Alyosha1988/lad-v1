@@ -851,3 +851,160 @@ body {
   opacity: 0.35;
   cursor: not-allowed;
 }
+
+/* ----- theory passport + Лад+ ----- */
+
+.theory-passport {
+  margin: 1rem 0;
+  padding: 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(180, 140, 80, 0.35);
+  background: rgba(28, 24, 20, 0.55);
+}
+
+.theory-kicker {
+  margin: 0 0 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #d4a05a;
+}
+
+.theory-degrees {
+  margin: 0 0 0.55rem;
+  font-family: Literata, Georgia, serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #f7ebdc;
+}
+
+.theory-line {
+  margin: 0 0 0.35rem;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: rgba(243, 230, 212, 0.78);
+}
+
+.theory-summary {
+  margin: 0.55rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: rgba(243, 230, 212, 0.55);
+}
+
+.theory-lock {
+  margin-top: 0.85rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid rgba(180, 140, 80, 0.25);
+}
+
+.theory-lock p {
+  margin: 0 0 0.55rem;
+  color: rgba(243, 230, 212, 0.78);
+  font-size: 0.92rem;
+}
+
+.lad-plus-screen .lad-plus-list {
+  margin: 1rem 0;
+  padding: 0 0 0 1.15rem;
+  display: grid;
+  gap: 0.55rem;
+  color: rgba(243, 230, 212, 0.78);
+  line-height: 1.45;
+}
+
+.lad-plus-prices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+  margin-bottom: 1rem;
+}
+
+.lad-plus-price {
+  padding: 0.85rem;
+  border-radius: 14px;
+  border: 1px solid rgba(180, 140, 80, 0.3);
+  background: rgba(20, 16, 12, 0.65);
+}
+
+.lad-plus-price.is-main {
+  border-color: rgba(212, 160, 90, 0.5);
+}
+
+.lad-plus-price .label {
+  margin: 0;
+  font-size: 0.78rem;
+  color: rgba(243, 230, 212, 0.55);
+}
+
+.lad-plus-price .sum {
+  margin: 0.35rem 0 0;
+  font-family: Literata, Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #f7ebdc;
+}
+
+.result.is-locked {
+  opacity: 0.55;
+  position: relative;
+}
+
+.result-lock-note {
+  margin: 0.4rem 0 0;
+  font-size: 0.85rem;
+  color: #d4a05a;
+}
+
+.btn-glow {
+  background: linear-gradient(135deg, #d4a05a, #e8b86a);
+  color: #1a1410;
+  border: none;
+  box-shadow: 0 0 0 1px rgba(212, 160, 90, 0.35);
+}
+
+.mood-mode-line {
+  margin: 0.35rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: rgba(212, 160, 90, 0.9);
+}
+
+.choice .mood-mode-line {
+  text-align: left;
+}
+
+.free-limit-note {
+  margin-top: 0.55rem;
+}
+
+.lad-plus-screen .kicker {
+  margin: 0 0 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #d4a05a;
+}
+
+.lad-plus-screen .h1 {
+  margin: 0 0 0.55rem;
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.lad-plus-screen .hand-note {
+  margin: 0 0 1rem;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.lad-plus-screen .actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}

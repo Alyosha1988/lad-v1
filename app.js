@@ -65,10 +65,47 @@ const state = {
     piano: [],
     baseFret: 1,
   },
+  returnFromPlus: null,
 };
 
 const stage = document.getElementById("stage");
 const brandSub = document.getElementById("brandSub");
+
+function hasPlus() {
+  return typeof LadTheory !== "undefined" && LadTheory.hasLadPlus();
+}
+
+function openLadPlus(returnFn) {
+  state.returnFromPlus = typeof returnFn === "function" ? returnFn : showStart;
+  brandSub.textContent = "Лад+ · расширенный доступ";
+  stage.innerHTML =
+    typeof LadTheory !== "undefined"
+      ? LadTheory.renderLadPlusScreen({ variant: "paper" })
+      : `<p class="hint">Модуль теории не загружен.</p>`;
+  if (typeof LadTheory !== "undefined") {
+    LadTheory.bindLadPlusScreen(stage, {
+      onChange: () => openLadPlus(state.returnFromPlus),
+      onBack: () => {
+        const back = state.returnFromPlus || showStart;
+        state.returnFromPlus = null;
+        back();
+      },
+    });
+  }
+}
+
+function bindTheoryHooks(root) {
+  root.querySelectorAll("[data-open-lad-plus]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const resume = () => {
+        if (state.start && state.mood && state.move && state.part && state.style) showResults();
+        else if (state.start && state.mood) showMood();
+        else showStart();
+      };
+      openLadPlus(resume);
+    });
+  });
+}
 
 /* ---------- theory helpers ---------- */
 
@@ -724,6 +761,9 @@ function showStart() {
           <button type="button" class="chord-play-btn chord-play-inline" data-play-chord="${c}" aria-label="Послушать ${c}">▶</button>
         </div>`
       )}
+      <div class="actions" style="margin-top:1rem">
+        <button type="button" class="btn btn-ghost" id="openPlusStart">Лад+</button>
+      </div>
     </div>
   `;
   document.getElementById("toDiscover")?.addEventListener("click", () => {
@@ -734,6 +774,7 @@ function showStart() {
     };
     showDiscover();
   });
+  document.getElementById("openPlusStart")?.addEventListener("click", () => openLadPlus(showStart));
   bindChoices(() => {
     showMood();
   }, "start");
@@ -942,22 +983,32 @@ function showDiscover() {
 
 function showMood() {
   brandSub.textContent = `Старт: ${state.start}`;
+  const centerHtml =
+    typeof LadTheory !== "undefined"
+      ? LadTheory.renderCenterCard(state.start, state.mood || "bright")
+      : "";
   stage.innerHTML = `
     <div class="panel">
       ${renderProgress(1, 5)}
       <p class="step-label">Шаг 2 из 5</p>
       <h2 class="question">Какая краска нужна фразе?</h2>
       <p class="hint">Это влияет на сортировку — каталог всё равно широкий.</p>
+      ${centerHtml}
       ${renderChoices(
         MOODS,
         "moods",
         (m) => `<button type="button" class="choice" data-value="${m.id}">
           <span class="title">${m.title}</span>
           <span class="desc">${m.desc}</span>
+          ${typeof LadTheory !== "undefined" ? LadTheory.renderMoodModeLine(m.id) : ""}
         </button>`
       )}
+      <div class="actions" style="margin-top:1rem">
+        <button type="button" class="btn btn-ghost" data-open-lad-plus>Лад+</button>
+      </div>
     </div>
   `;
+  bindTheoryHooks(stage);
   bindChoices(() => showMove(), "mood");
 }
 
@@ -1045,25 +1096,51 @@ function showResults() {
   const moveTitle = MOVES.find((m) => m.id === answers.move)?.title ?? "";
   const partTitle = PARTS.find((m) => m.id === answers.part)?.title ?? "";
   const styleTitle = STYLES.find((m) => m.id === answers.style)?.title ?? "";
+  const plus = hasPlus();
+  const freeLimit = typeof LadTheory !== "undefined" ? LadTheory.freePathLimit() : 3;
+  const modeLine =
+    typeof LadTheory !== "undefined" ? LadTheory.moodModeInfo(answers.mood).modeLine : "";
 
-  brandSub.textContent = `${ideas.length} последовательностей · ${fixKeyLabel(key)}`;
+  brandSub.textContent = `${ideas.length} последовательностей · ${formatKeyLabel(key)}`;
 
-  const grouped = groupByFamily(ideas);
+  const flat = [];
+  const groupedRaw = groupByFamily(ideas);
+  for (const [family, list] of groupedRaw) {
+    list.forEach((p) => flat.push({ ...p, family }));
+  }
+
+  let freeLeft = plus ? Infinity : freeLimit;
   let blocks = "";
+  const grouped = groupByFamily(flat);
   for (const [family, list] of grouped) {
     blocks += `<div class="family">
       <h3 class="family-title">${family}</h3>
       <div class="results">
         ${list
-          .map(
-            (p) => `
-          <article class="result">
-            <p class="result-kind">${p.kind}</p>
+          .map((p) => {
+            const locked = !plus && freeLeft <= 0;
+            if (!locked) freeLeft -= 1;
+            const kindLabel =
+              typeof LadTheory !== "undefined" ? LadTheory.upperRomans(p.kind) : p.kind;
+            const passport =
+              typeof LadTheory !== "undefined"
+                ? LadTheory.buildPassport(p, { moodId: answers.mood, start: answers.start })
+                : null;
+            const passportHtml = passport ? LadTheory.renderPassportHtml(passport) : "";
+            return `
+          <article class="result ${locked ? "is-locked" : ""}">
+            <p class="result-kind">${kindLabel}</p>
             <p class="result-path">${p.path.join(" → ")}</p>
-            ${renderPathDiagrams(p.path)}
-            <p class="result-why">${p.why}</p>
-          </article>`
-          )
+            ${
+              locked
+                ? `<p class="result-lock-note">Полный разбор и аппликатуры этого хода — в Лад+</p>
+                   <button type="button" class="btn btn-glow btn-tiny" data-open-lad-plus>Открыть Лад+</button>`
+                : `${renderPathDiagrams(p.path)}
+                   ${passportHtml}
+                   <p class="result-why">${p.why}</p>`
+            }
+          </article>`;
+          })
           .join("")}
       </div>
     </div>`;
@@ -1079,6 +1156,13 @@ function showResults() {
     )
     .join("");
 
+  const limitNote = plus
+    ? ""
+    : `<p class="summary free-limit-note">Бесплатно открыты <strong>${Math.min(
+        freeLimit,
+        flat.length
+      )}</strong> из <strong>${flat.length}</strong> ходов. Остальные — в Лад+.</p>`;
+
   stage.innerHTML = `
     <div class="panel panel-wide">
       ${renderProgress(5, 5)}
@@ -1086,8 +1170,15 @@ function showResults() {
       <h2 class="question">От ${answers.start}</h2>
       <p class="summary">
         <strong>${answers.start}</strong> · ${moodTitle.toLowerCase()} · ${moveTitle.toLowerCase()} · ${partTitle.toLowerCase()} · ${styleTitle.toLowerCase()}
-        <br />Центр: <strong>${fixKeyLabel(key)}</strong> · найдено <strong>${ideas.length}</strong>
+        <br />Центр: <strong>${formatKeyLabel(key)}</strong> · найдено <strong>${ideas.length}</strong>
+        ${modeLine ? `<br />Лад: <strong>${modeLine}</strong>` : ""}
       </p>
+      ${limitNote}
+      ${
+        typeof LadTheory !== "undefined"
+          ? LadTheory.renderCenterCard(answers.start, answers.mood)
+          : ""
+      }
       ${blocks}
       <div class="family">
         <h3 class="family-title">Мелодия / лады</h3>
@@ -1100,9 +1191,12 @@ function showResults() {
         <button type="button" class="btn btn-primary" id="again">Другой стартовый аккорд</button>
         <button type="button" class="btn btn-ghost" id="restyle">Сменить язык / фильтры</button>
         <button type="button" class="btn btn-ghost" id="allstyles">Показать все семейства</button>
+        <button type="button" class="btn btn-glow" data-open-lad-plus>Лад+</button>
       </div>
     </div>
   `;
+
+  bindTheoryHooks(stage);
 
   document.getElementById("again").addEventListener("click", () => {
     state.start = null;
