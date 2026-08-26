@@ -70,6 +70,8 @@ const state = {
   returnFromDegrees: null,
   glossaryQuery: "",
   glossaryFocus: null,
+  /** degrees | glossary | plus | null — чтобы голос не уводил с оверлея */
+  overlay: null,
 };
 
 const stage = document.getElementById("stage");
@@ -80,6 +82,7 @@ function hasPlus() {
 }
 
 function openLadPlus(returnFn) {
+  state.overlay = "plus";
   state.returnFromPlus = typeof returnFn === "function" ? returnFn : showStart;
   brandSub.textContent = "Лад+ · расширенный доступ";
   stage.innerHTML =
@@ -92,6 +95,7 @@ function openLadPlus(returnFn) {
       onBack: () => {
         const back = state.returnFromPlus || showStart;
         state.returnFromPlus = null;
+        state.overlay = null;
         back();
       },
     });
@@ -99,6 +103,7 @@ function openLadPlus(returnFn) {
 }
 
 function openGlossary(returnFn, termId) {
+  state.overlay = "glossary";
   state.returnFromGlossary = typeof returnFn === "function" ? returnFn : showStart;
   state.glossaryQuery = state.glossaryQuery || "";
   state.glossaryFocus = termId || null;
@@ -127,6 +132,7 @@ function openGlossary(returnFn, termId) {
       onBack: () => {
         const back = state.returnFromGlossary || showStart;
         state.returnFromGlossary = null;
+        state.overlay = null;
         back();
       },
     });
@@ -134,12 +140,12 @@ function openGlossary(returnFn, termId) {
   }
 }
 
-
 function openDegrees(returnFn) {
   if (!state.start) {
     alert("Сначала выберите стартовый аккорд — ступени считаются только от него.");
     return;
   }
+  state.overlay = "degrees";
   state.returnFromDegrees = typeof returnFn === "function" ? returnFn : showStart;
   brandSub.textContent = `Ступени от ${state.start}`;
   stage.innerHTML =
@@ -152,6 +158,7 @@ function openDegrees(returnFn) {
       onBack: () => {
         const back = state.returnFromDegrees || showStart;
         state.returnFromDegrees = null;
+        state.overlay = null;
         back();
       },
     });
@@ -191,10 +198,23 @@ function bindTheoryHooks(root) {
     });
   });
   root.querySelectorAll("[data-set-voice]").forEach((btn) => {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
       if (typeof LadTheory === "undefined") return;
       LadTheory.setVoice(btn.dataset.setVoice);
-      // перерисовать текущий экран максимально близко
+      // остаёмся на текущем оверлее / экране
+      if (state.overlay === "degrees") {
+        openDegrees(state.returnFromDegrees || showStart);
+        return;
+      }
+      if (state.overlay === "glossary") {
+        openGlossary(state.returnFromGlossary || showStart, state.glossaryFocus);
+        return;
+      }
+      if (state.overlay === "plus") {
+        openLadPlus(state.returnFromPlus || showStart);
+        return;
+      }
       if (state.start && state.mood && state.move && state.part && state.style) showResults();
       else if (state.start && state.mood) showMood();
       else showStart();
