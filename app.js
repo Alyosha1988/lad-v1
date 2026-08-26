@@ -1101,7 +1101,7 @@ function showResults() {
   const modeLine =
     typeof LadTheory !== "undefined" ? LadTheory.moodModeInfo(answers.mood).modeLine : "";
 
-  brandSub.textContent = `${ideas.length} последовательностей · ${formatKeyLabel(key)}`;
+  brandSub.textContent = `${ideas.length} последовательностей · ${fixKeyLabel(key)}`;
 
   const flat = [];
   const groupedRaw = groupByFamily(ideas);
@@ -1170,7 +1170,7 @@ function showResults() {
       <h2 class="question">От ${answers.start}</h2>
       <p class="summary">
         <strong>${answers.start}</strong> · ${moodTitle.toLowerCase()} · ${moveTitle.toLowerCase()} · ${partTitle.toLowerCase()} · ${styleTitle.toLowerCase()}
-        <br />Центр: <strong>${formatKeyLabel(key)}</strong> · найдено <strong>${ideas.length}</strong>
+        <br />Центр: <strong>${fixKeyLabel(key)}</strong> · найдено <strong>${ideas.length}</strong>
         ${modeLine ? `<br />Лад: <strong>${modeLine}</strong>` : ""}
       </p>
       ${limitNote}
