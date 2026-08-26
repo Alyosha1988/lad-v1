@@ -400,9 +400,16 @@ body {
   margin: 0 0 0.35rem;
   font-size: 0.72rem;
   font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  /* не uppercase: иначе bIII → BIII и ломается бемоль */
+  text-transform: none;
   color: var(--amber);
+}
+
+.result-path--locked {
+  opacity: 0.75;
+  font-style: italic;
+  letter-spacing: 0.02em;
 }
 
 .result-path {
@@ -969,6 +976,8 @@ body {
   font-size: 0.78rem;
   line-height: 1.35;
   color: rgba(212, 160, 90, 0.9);
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .choice .mood-mode-line {

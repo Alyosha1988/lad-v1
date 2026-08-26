@@ -266,12 +266,12 @@ function noteIndex(note) {
 }
 
 function preferFlats(tonic, mode) {
-  const flatTonics = new Set(["F", "Bb", "Eb", "Ab", "Db", "Gb", "C", "D", "G", "A"]);
-  // Heuristic: F and flat-key signatures + when tonic is Bb etc.
-  const sharpish = new Set(["G", "D", "A", "E", "B", "F#"]);
-  if (tonic === "F" || tonic === "Bb" || tonic === "Eb" || tonic === "Ab" || tonic === "Db") return true;
-  if (mode === "minor" && ["D", "G", "C", "F"].includes(tonic)) return true;
-  if (sharpish.has(tonic) && mode === "major") return false;
+  const flatMajors = new Set(["F", "Bb", "Eb", "Ab", "Db", "Gb"]);
+  const sharpMinors = new Set(["E", "B", "F#", "C#", "G#", "D#"]);
+  const sharpMajors = new Set(["G", "D", "A", "E", "B", "F#", "C#"]);
+  if (flatMajors.has(tonic)) return true;
+  if (mode === "minor") return !sharpMinors.has(tonic);
+  if (sharpMajors.has(tonic)) return false;
   return false;
 }
 
@@ -1272,12 +1272,13 @@ function showResults() {
             return `
           <article class="result ${locked ? "is-locked" : ""}">
             <p class="result-kind">${kindLabel}</p>
-            <p class="result-path">${p.path.join(" → ")}</p>
             ${
               locked
-                ? `<p class="result-lock-note">Полный разбор и аппликатуры этого хода — в Лад+</p>
+                ? `<p class="result-path result-path--locked">Последовательность скрыта</p>
+                   <p class="result-lock-note">Полный ход, разбор и аппликатуры — в Лад+</p>
                    <button type="button" class="btn btn-glow btn-tiny" data-open-lad-plus>Открыть Лад+</button>`
-                : `${renderPathDiagrams(p.path)}
+                : `<p class="result-path">${p.path.join(" → ")}</p>
+                   ${renderPathDiagrams(p.path)}
                    ${passportHtml}`
             }
           </article>`;
