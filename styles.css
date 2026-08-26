@@ -1121,3 +1121,12 @@ body {
   clip: rect(0,0,0,0);
   border: 0;
 }
+
+.voice-toggle--mini {
+  margin: 0 0 0.75rem;
+}
+.chip.chip-btn.is-on {
+  background: rgba(212, 160, 90, 0.2);
+  border-color: rgba(212, 160, 90, 0.55);
+  color: #f7ebdc;
+}

@@ -154,6 +154,16 @@ function bindTheoryHooks(root) {
       openGlossary(resume, btn.dataset.termId || null);
     });
   });
+  root.querySelectorAll("[data-set-voice]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (typeof LadTheory === "undefined") return;
+      LadTheory.setVoice(btn.dataset.setVoice);
+      // перерисовать текущий экран максимально близко
+      if (state.start && state.mood && state.move && state.part && state.style) showResults();
+      else if (state.start && state.mood) showMood();
+      else showStart();
+    });
+  });
 }
 
 /* ---------- theory helpers ---------- */
@@ -1151,7 +1161,11 @@ function showResults() {
   const plus = hasPlus();
   const freeLimit = typeof LadTheory !== "undefined" ? LadTheory.freePathLimit() : 3;
   const modeLine =
-    typeof LadTheory !== "undefined" ? LadTheory.moodModeInfo(answers.mood).modeLine : "";
+    typeof LadTheory !== "undefined"
+      ? LadTheory.moodLineForVoice
+        ? LadTheory.moodLineForVoice(answers.mood)
+        : LadTheory.moodModeInfo(answers.mood).modeLine
+      : "";
 
   brandSub.textContent = `${ideas.length} последовательностей · ${fixKeyLabel(key)}`;
 
