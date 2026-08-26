@@ -1136,8 +1136,7 @@ function showResults() {
                 ? `<p class="result-lock-note">Полный разбор и аппликатуры этого хода — в Лад+</p>
                    <button type="button" class="btn btn-glow btn-tiny" data-open-lad-plus>Открыть Лад+</button>`
                 : `${renderPathDiagrams(p.path)}
-                   ${passportHtml}
-                   <p class="result-why">${p.why}</p>`
+                   ${passportHtml}`
             }
           </article>`;
           })
