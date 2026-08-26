@@ -67,6 +67,7 @@ const state = {
   },
   returnFromPlus: null,
   returnFromGlossary: null,
+  returnFromDegrees: null,
   glossaryQuery: "",
   glossaryFocus: null,
 };
@@ -133,6 +134,31 @@ function openGlossary(returnFn, termId) {
   }
 }
 
+
+function openDegrees(returnFn) {
+  if (!state.start) {
+    alert("Сначала выберите стартовый аккорд — ступени считаются только от него.");
+    return;
+  }
+  state.returnFromDegrees = typeof returnFn === "function" ? returnFn : showStart;
+  brandSub.textContent = `Ступени от ${state.start}`;
+  stage.innerHTML =
+    typeof LadTheory !== "undefined"
+      ? LadTheory.renderDegreesScreen({ variant: "paper", symbol: state.start })
+      : `<p class="hint">Раздел ступеней не загружен.</p>`;
+  if (typeof LadTheory !== "undefined") {
+    LadTheory.bindDegreesScreen(stage, {
+      onChange: () => openDegrees(state.returnFromDegrees),
+      onBack: () => {
+        const back = state.returnFromDegrees || showStart;
+        state.returnFromDegrees = null;
+        back();
+      },
+    });
+    bindTheoryHooks(stage);
+  }
+}
+
 function bindTheoryHooks(root) {
   root.querySelectorAll("[data-open-lad-plus]").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -152,6 +178,16 @@ function bindTheoryHooks(root) {
         else showStart();
       };
       openGlossary(resume, btn.dataset.termId || null);
+    });
+  });
+  root.querySelectorAll("[data-open-degrees]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const resume = () => {
+        if (state.start && state.mood && state.move && state.part && state.style) showResults();
+        else if (state.start && state.mood) showMood();
+        else showStart();
+      };
+      openDegrees(resume);
     });
   });
   root.querySelectorAll("[data-set-voice]").forEach((btn) => {
@@ -1067,6 +1103,7 @@ function showMood() {
       <div class="actions" style="margin-top:1rem">
         <button type="button" class="btn btn-ghost" data-open-lad-plus>Лад+</button>
         <button type="button" class="btn btn-ghost" data-open-glossary>Словарь</button>
+        <button type="button" class="btn btn-ghost" data-open-degrees>Ступени от ${state.start}</button>
       </div>
     </div>
   `;
@@ -1258,6 +1295,7 @@ function showResults() {
         <button type="button" class="btn btn-ghost" id="allstyles">Показать все семейства</button>
         <button type="button" class="btn btn-glow" data-open-lad-plus>Лад+</button>
         <button type="button" class="btn btn-ghost" data-open-glossary>Словарь</button>
+        <button type="button" class="btn btn-ghost" data-open-degrees>Ступени от ${answers.start}</button>
       </div>
     </div>
   `;
