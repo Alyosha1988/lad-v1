@@ -1334,6 +1334,11 @@ document.querySelectorAll("[data-instrument]").forEach((btn) => {
   btn.addEventListener("click", () => {
     setTimeout(() => {
       if (brandSub?.textContent?.includes("Узнать аккорд")) showDiscover();
+      else if (brandSub?.textContent?.startsWith("Ступени от") && state.start) {
+        openDegrees(state.returnFromDegrees || showStart);
+      } else if (typeof refreshAllPathDiagrams === "function") {
+        refreshAllPathDiagrams();
+      }
     }, 0);
   });
 });
