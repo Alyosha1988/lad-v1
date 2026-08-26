@@ -66,6 +66,9 @@ const state = {
     baseFret: 1,
   },
   returnFromPlus: null,
+  returnFromGlossary: null,
+  glossaryQuery: "",
+  glossaryFocus: null,
 };
 
 const stage = document.getElementById("stage");
@@ -94,6 +97,42 @@ function openLadPlus(returnFn) {
   }
 }
 
+function openGlossary(returnFn, termId) {
+  state.returnFromGlossary = typeof returnFn === "function" ? returnFn : showStart;
+  state.glossaryQuery = state.glossaryQuery || "";
+  state.glossaryFocus = termId || null;
+  brandSub.textContent = "Словарь гармонии";
+  stage.innerHTML =
+    typeof LadTheory !== "undefined"
+      ? LadTheory.renderGlossaryScreen({
+          variant: "paper",
+          query: state.glossaryQuery,
+          focusId: state.glossaryFocus,
+        })
+      : `<p class="hint">Словарь не загружен.</p>`;
+  if (typeof LadTheory !== "undefined") {
+    LadTheory.bindGlossaryScreen(stage, {
+      onChange: ({ query }) => {
+        state.glossaryQuery = query || "";
+        state.glossaryFocus = null;
+        openGlossary(state.returnFromGlossary, null);
+        const input = document.getElementById("glossaryQuery");
+        if (input) {
+          input.focus();
+          const len = input.value.length;
+          input.setSelectionRange(len, len);
+        }
+      },
+      onBack: () => {
+        const back = state.returnFromGlossary || showStart;
+        state.returnFromGlossary = null;
+        back();
+      },
+    });
+    bindTheoryHooks(stage);
+  }
+}
+
 function bindTheoryHooks(root) {
   root.querySelectorAll("[data-open-lad-plus]").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -103,6 +142,16 @@ function bindTheoryHooks(root) {
         else showStart();
       };
       openLadPlus(resume);
+    });
+  });
+  root.querySelectorAll("[data-open-glossary]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const resume = () => {
+        if (state.start && state.mood && state.move && state.part && state.style) showResults();
+        else if (state.start && state.mood) showMood();
+        else showStart();
+      };
+      openGlossary(resume, btn.dataset.termId || null);
     });
   });
 }
@@ -763,6 +812,7 @@ function showStart() {
       )}
       <div class="actions" style="margin-top:1rem">
         <button type="button" class="btn btn-ghost" id="openPlusStart">Лад+</button>
+        <button type="button" class="btn btn-ghost" data-open-glossary>Словарь</button>
       </div>
     </div>
   `;
@@ -775,6 +825,7 @@ function showStart() {
     showDiscover();
   });
   document.getElementById("openPlusStart")?.addEventListener("click", () => openLadPlus(showStart));
+  bindTheoryHooks(stage);
   bindChoices(() => {
     showMood();
   }, "start");
@@ -1005,6 +1056,7 @@ function showMood() {
       )}
       <div class="actions" style="margin-top:1rem">
         <button type="button" class="btn btn-ghost" data-open-lad-plus>Лад+</button>
+        <button type="button" class="btn btn-ghost" data-open-glossary>Словарь</button>
       </div>
     </div>
   `;
@@ -1191,6 +1243,7 @@ function showResults() {
         <button type="button" class="btn btn-ghost" id="restyle">Сменить язык / фильтры</button>
         <button type="button" class="btn btn-ghost" id="allstyles">Показать все семейства</button>
         <button type="button" class="btn btn-glow" data-open-lad-plus>Лад+</button>
+        <button type="button" class="btn btn-ghost" data-open-glossary>Словарь</button>
       </div>
     </div>
   `;
