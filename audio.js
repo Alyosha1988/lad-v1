@@ -46,6 +46,7 @@ const loadQueue = [];
 const activeJobs = new Map();
 let activeLoads = 0;
 let playGeneration = 0;
+let melodyGeneration = 0;
 let warmTimer = null;
 
 let currentInstrument =
@@ -529,14 +530,18 @@ function flashPlaying(el) {
 }
 
 function handlePlayEvent(e) {
-  const playBtn = e.target.closest("[data-play-frets], [data-play-chord], [data-play-notes]");
+  const playBtn = e.target.closest(
+    "[data-play-frets], [data-play-chord], [data-play-notes], [data-play-melody]"
+  );
   if (!playBtn) return false;
   e.preventDefault();
   e.stopPropagation();
   unlockAudio();
   flashPlaying(playBtn);
   try {
-    if (playBtn.dataset.playNotes) {
+    if (playBtn.dataset.playMelody) {
+      playMelody(playBtn.dataset.playMelody.split(",").map((n) => parseInt(n, 10)));
+    } else if (playBtn.dataset.playNotes) {
       playMidiNotes(playBtn.dataset.playNotes.split(",").map((n) => parseInt(n, 10)));
     } else if (playBtn.dataset.playFrets) {
       playVoicing(parseFrets(playBtn.dataset.playFrets));
@@ -572,6 +577,39 @@ function playMidiNotes(midis) {
   return true;
 }
 
+/** Последовательная гамма / мотив (не кластер). Ноты планируются по мере загрузки. */
+function playMelody(midis, opts = {}) {
+  const ctx = unlockAudio();
+  if (!ctx || !midis?.length) return false;
+  const clean = midis.map((n) => parseInt(n, 10)).filter((n) => Number.isFinite(n));
+  if (!clean.length) return false;
+  const instrument = currentInstrument;
+  const style = instrumentPlayStyle(instrument);
+  const dest = destinationFor(instrument, ctx);
+  const gap = (opts.gapMs ?? 165) / 1000;
+  const noteDur = opts.duration ?? Math.min(0.48, style.duration * 0.62);
+  const gen = ++melodyGeneration;
+  const t0 = ctx.currentTime + 0.04;
+
+  clean.forEach((m, i) => {
+    loadSample(instrument, m, 96 - i).then((buf) => {
+      if (gen !== melodyGeneration) return;
+      if (ctx.state === "suspended") ctx.resume().catch(() => {});
+      const when = t0 + i * gap;
+      const g = style.gain * (0.9 + (i === 0 || i === clean.length - 1 ? 0.1 : 0));
+      if (buf) playBuffer(ctx, buf, when, g, dest, noteDur, { ...style, strum: 0 });
+      else synthFallback(ctx, midiToFreq(m), when, noteDur, g * 0.58, dest, instrument);
+    });
+  });
+  return true;
+}
+
+function prefetchMelody(midis, priority = 70) {
+  if (!midis?.length) return;
+  const instrument = currentInstrument;
+  midis.forEach((m, i) => loadSample(instrument, m, priority - i));
+}
+
 function handleInstrumentEvent(e) {
   const btn = e.target.closest("[data-instrument]");
   if (!btn) return false;
@@ -600,7 +638,7 @@ function bindAudioEvents(root = document) {
   const onPointer = (e) => {
     if (e.type === "pointerup" && e.pointerType === "mouse" && e.button !== 0) return;
     const el =
-      e.target.closest?.("[data-instrument], [data-play-frets], [data-play-chord], [data-play-notes]") ||
+      e.target.closest?.("[data-instrument], [data-play-frets], [data-play-chord], [data-play-notes], [data-play-melody]") ||
       null;
     if (!el) return;
     const now = Date.now();
@@ -610,11 +648,20 @@ function bindAudioEvents(root = document) {
   };
 
   root.addEventListener("pointerup", onPointer, true);
-  // клавиатура / старые клиенты без Pointer Events
+  // клавиатура / старые клиенты без Pointer Events; iOS — запасной click
   root.addEventListener(
     "click",
     (e) => {
-      if (window.PointerEvent) return;
+      const el =
+        e.target.closest?.(
+          "[data-instrument], [data-play-frets], [data-play-chord], [data-play-notes], [data-play-melody]"
+        ) || null;
+      if (!el) {
+        if (!window.PointerEvent) onPointer(e);
+        return;
+      }
+      const now = Date.now();
+      if (now - (lastByEl.get(el) || 0) < 380) return;
       onPointer(e);
     },
     true
@@ -646,6 +693,9 @@ if (typeof document !== "undefined") {
 const LadAudioAPI = {
   playVoicing,
   playChord,
+  playMidiNotes,
+  playMelody,
+  prefetchMelody,
   fretsToNotes,
   parseFrets,
   midiToFreq,

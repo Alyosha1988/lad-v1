@@ -72,6 +72,8 @@ const state = {
   glossaryFocus: null,
   /** degrees | glossary | plus | null — чтобы голос не уводил с оверлея */
   overlay: null,
+  /** Развёрнутые аппликатуры в каталоге: pathKey -> true */
+  resultsDiagsOpen: {},
 };
 
 const stage = document.getElementById("stage");
@@ -200,6 +202,12 @@ function bindTheoryHooks(root) {
   // голос: только через document delegation (bindVoiceDelegation)
 }
 
+function renderWithScrollKeep(fn) {
+  const y = window.scrollY || window.pageYOffset || 0;
+  fn();
+  window.scrollTo(0, y);
+}
+
 /** Единый обработчик голоса — не уводит с оверлея ступеней/словаря. */
 function bindVoiceDelegation() {
   if (document.__ladVoiceBound) return;
@@ -231,7 +239,10 @@ function bindVoiceDelegation() {
           openLadPlus(state.returnFromPlus || showStart);
           return;
         }
-        if (state.start && state.mood && state.move && state.part && state.style) showResults();
+        if (state.start && state.mood && state.move && state.part && state.style) {
+          renderWithScrollKeep(() => showResults());
+          return;
+        }
         else if (state.start && state.mood) showMood();
         else showStart();
       });
@@ -1269,8 +1280,10 @@ function showResults() {
                 ? LadTheory.buildPassport(p, { moodId: answers.mood, start: answers.start })
                 : null;
             const passportHtml = passport ? LadTheory.renderPassportHtml(passport) : "";
+            const pathKey = p.path.join("|");
+            const diagsOpen = !!state.resultsDiagsOpen[pathKey];
             return `
-          <article class="result ${locked ? "is-locked" : ""}">
+          <article class="result ${locked ? "is-locked" : ""}" data-result-path="${pathKey}">
             <p class="result-kind">${kindLabel}</p>
             ${
               locked
@@ -1278,8 +1291,10 @@ function showResults() {
                    <p class="result-lock-note">Полный ход, разбор и аппликатуры — в Лад+</p>
                    <button type="button" class="btn btn-glow btn-tiny" data-open-lad-plus>Открыть Лад+</button>`
                 : `<p class="result-path">${p.path.join(" → ")}</p>
-                   ${renderPathDiagrams(p.path)}
-                   ${passportHtml}`
+                   <button type="button" class="btn btn-ghost btn-tiny diag-toggle" data-toggle-result-diag="${pathKey}" aria-expanded="${diagsOpen ? "true" : "false"}">
+                     ${diagsOpen ? "Скрыть аппликатуры" : "Аппликатуры и разбор"}
+                   </button>
+                   ${diagsOpen ? `${renderPathDiagrams(p.path)}${passportHtml}` : ""}`
             }
           </article>`;
           })
@@ -1342,12 +1357,21 @@ function showResults() {
 
   bindTheoryHooks(stage);
 
+  stage.querySelectorAll("[data-toggle-result-diag]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const key = btn.dataset.toggleResultDiag;
+      state.resultsDiagsOpen[key] = !state.resultsDiagsOpen[key];
+      renderWithScrollKeep(() => showResults());
+    });
+  });
+
   document.getElementById("again").addEventListener("click", () => {
     state.start = null;
     state.mood = null;
     state.move = null;
     state.part = null;
     state.style = null;
+    state.resultsDiagsOpen = {};
     state.discover = {
       frets: typeof emptyGuitarFrets === "function" ? emptyGuitarFrets() : [-1, -1, -1, -1, -1, -1],
       piano: [],
