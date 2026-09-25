@@ -98,32 +98,38 @@ body {
   text-align: center;
   margin-bottom: 2rem;
   animation: rise 0.8s var(--ease) both;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
 }
 
 .brand-mark {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(2.75rem, 10vw, 3.5rem);
+  font-size: clamp(2.5rem, 9vw, 3.25rem);
   font-weight: 600;
   letter-spacing: var(--lad-tracking-display);
-  line-height: 1.07;
+  line-height: 1.1;
   color: var(--ink);
 }
 
 .brand-sub {
-  margin: 0.65rem 0 0;
+  margin: 0;
   color: var(--ink-soft);
-  font-size: 1.0625rem;
+  font-size: clamp(0.95rem, 2.8vw, 1.0625rem);
   font-weight: 400;
-  max-width: 32ch;
-  margin-inline: auto;
+  max-width: 36ch;
+  padding: 0 0.5rem;
   line-height: 1.4;
+  overflow-wrap: anywhere;
+  word-break: normal;
 }
 
 .instrument-bar {
   display: inline-flex;
   gap: 0.5rem;
-  margin-top: 1.15rem;
+  margin-top: 0.35rem;
   padding: 0.35rem;
   border-radius: var(--lad-radius-pill);
   border: 1px solid var(--lad-line);
@@ -132,8 +138,9 @@ body {
 
 .instrument-btn {
   appearance: none;
-  width: 3.4rem;
-  height: 3.4rem;
+  width: 3.25rem;
+  height: 3.25rem;
+  flex: 0 0 auto;
   border-radius: 999px;
   border: 1px solid transparent;
   background: var(--lad-bg);
@@ -141,7 +148,7 @@ body {
   display: grid;
   place-items: center;
   cursor: pointer;
-  padding: 0;
+  padding: 0.15rem;
   overflow: hidden;
   transition:
     background var(--lad-dur) var(--ease),
@@ -153,8 +160,9 @@ body {
   width: 100%;
   height: 100%;
   display: block;
-  object-fit: cover;
-  opacity: 0.9;
+  object-fit: contain;
+  border-radius: 999px;
+  opacity: 0.95;
   transition: opacity var(--lad-dur) var(--ease);
 }
 
@@ -188,33 +196,38 @@ body {
   background: var(--lad-bg-soft);
   border: none;
   border-radius: var(--radius);
-  padding: 1.5rem 1.35rem 1.35rem;
+  padding: 1.35rem 1.15rem 1.25rem;
   box-shadow: none;
+  overflow: hidden;
 }
 
 .step-label {
-  margin: 0 0 0.4rem;
+  margin: 0.35rem 0 0.45rem;
   font-size: 12px;
   font-weight: 400;
   letter-spacing: 0.02em;
   text-transform: none;
   color: var(--lad-ink-faint);
+  line-height: 1.35;
 }
 
 .question {
-  margin: 0 0 1.25rem;
+  margin: 0 0 0.55rem;
   font-family: var(--font-display);
-  font-size: clamp(1.4rem, 4.5vw, 1.75rem);
+  font-size: clamp(1.25rem, 4.2vw, 1.65rem);
   font-weight: 600;
-  line-height: 1.2;
+  line-height: 1.25;
   letter-spacing: var(--lad-tracking-display);
   color: var(--ink);
+  overflow-wrap: anywhere;
 }
 
 .hint {
-  margin: -0.6rem 0 1.2rem;
+  margin: 0 0 1rem;
   color: var(--ink-mute);
   font-size: 0.95rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
 }
 
 .choices {
@@ -223,7 +236,8 @@ body {
 }
 
 .choices.chords {
-  grid-template-columns: repeat(auto-fill, minmax(5.2rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(4.75rem, 1fr));
+  align-items: stretch;
 }
 
 .chord-choice {
@@ -231,7 +245,8 @@ body {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 0.25rem;
+  gap: 0.3rem;
+  min-width: 0;
 }
 
 .chord-choice .choice.chord {
@@ -277,9 +292,10 @@ body {
 
 .chord-play-inline {
   width: 100%;
-  min-height: 2.75rem;
-  padding: 0.55rem 0;
-  font-size: 1.05rem;
+  min-height: 2.4rem;
+  padding: 0.4rem 0;
+  font-size: 0.95rem;
+  flex: 0 0 auto;
 }
 
 .chord-diag .chord-play-btn {
@@ -316,6 +332,9 @@ body {
   padding: 0.9rem 1rem;
   cursor: pointer;
   text-align: left;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  min-width: 0;
   transition:
     border-color var(--lad-dur) var(--ease),
     background var(--lad-dur) var(--ease);
@@ -335,10 +354,14 @@ body {
 .choice.chord {
   text-align: center;
   font-family: var(--font-display);
-  font-size: 1.15rem;
+  font-size: clamp(0.95rem, 3.5vw, 1.1rem);
   font-weight: 600;
-  padding: 0.85rem 0.4rem;
+  padding: 0.7rem 0.3rem;
   letter-spacing: var(--lad-tracking-display);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .choice .title {
@@ -357,8 +380,10 @@ body {
 
 .progress {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.4rem;
-  margin-bottom: 1rem;
+  margin: 0 0 0.15rem;
+  min-height: 0.45rem;
 }
 
 .dot {
@@ -440,10 +465,12 @@ body {
 .result-path {
   margin: 0 0 0.55rem;
   font-family: var(--font-display);
-  font-size: 1.35rem;
+  font-size: clamp(1.1rem, 4vw, 1.35rem);
   font-weight: 600;
   letter-spacing: var(--lad-tracking-display);
   color: var(--ink);
+  line-height: 1.3;
+  overflow-wrap: anywhere;
 }
 
 .result-path span {
@@ -491,7 +518,7 @@ body {
   font-size: 1.1rem;
   opacity: 0.9;
   padding: 0 0.1rem;
-  margin-top: -0.8rem;
+  margin-top: 0.35rem;
 }
 
 .diag-step {
@@ -573,6 +600,12 @@ body {
   flex-wrap: wrap;
   gap: 0.65rem;
   margin-top: 1.25rem;
+  align-items: stretch;
+}
+
+.actions .btn {
+  flex: 1 1 auto;
+  min-width: min(100%, 9rem);
 }
 
 .btn {
@@ -585,8 +618,21 @@ body {
   padding: var(--lad-cta-pad);
   min-height: var(--lad-cta-h);
   cursor: pointer;
+  line-height: 1.25;
+  text-align: center;
+  overflow-wrap: anywhere;
+  max-width: 100%;
   transition: background var(--lad-dur) var(--ease), color var(--lad-dur) var(--ease),
     border-color var(--lad-dur) var(--ease), opacity 0.2s ease;
+}
+
+.btn-block {
+  width: 100%;
+  margin: 0.35rem 0 0.75rem;
+  white-space: normal;
+  height: auto;
+  min-height: var(--lad-cta-h);
+  padding: 0.75rem 1.15rem;
 }
 
 .btn:hover {
@@ -1271,11 +1317,42 @@ body {
 @media (max-width: 480px) {
   .brand {
     animation: none;
+    margin-bottom: 1.35rem;
+    gap: 0.45rem;
+  }
+  .app {
+    width: min(860px, calc(100% - 1.5rem));
+    padding-top: 1.5rem;
+  }
+  .panel {
+    padding: 1.1rem 0.9rem 1.1rem;
   }
   .result {
     padding: 0.85rem 0.9rem;
   }
   .brand-mark {
-    font-size: clamp(2.4rem, 11vw, 2.75rem);
+    font-size: clamp(2.25rem, 10vw, 2.6rem);
+  }
+  .choices.chords {
+    grid-template-columns: repeat(auto-fill, minmax(4.4rem, 1fr));
+    gap: 0.5rem;
+  }
+  .btn {
+    font-size: 16px;
+  }
+  .question {
+    font-size: clamp(1.2rem, 5.5vw, 1.45rem);
+  }
+  .discover-hit {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+  .discover-hit .sym,
+  .discover-hit .why {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+  .degree-row {
+    grid-template-columns: 3.4rem 1fr;
   }
 }
