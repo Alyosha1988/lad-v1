@@ -699,11 +699,6 @@ body {
 
 /* ----- discover fretboard / piano (v1) ----- */
 
-.btn-block {
-  width: 100%;
-  margin: 0.35rem 0 0.75rem;
-}
-
 .btn-tiny {
   padding: 0.4rem 0.7rem;
   font-size: 0.82rem;
